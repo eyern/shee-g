@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Shee Gifts & Flowers | Thika Town
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+{% endblock head %}
+
+{% block contents %}
+    <!-- Main container -->
+    <main class="container py-4 py-md-5">
+
+        {% if banners %}
+            <!-- Hero Section -->
+            <section class="mb-5 hero-section">
+                <div id="heroCarousel" class="modern-hero">
+                    <div class="hero-slides">
+                        {% for banner in banners %}
+                            <div class="hero-slide {% if forloop.first %}active{% endif %}">
+                                <a href="{{ banner.link }}" class="d-block">
+                                    <img src="{{ banner.image.url }}"
+                                         alt="{{ banner.title }}"
+                                         class="hero-banner"
+                                         loading="eager"> <!-- لود سریع برای اولین تصویر -->
+                                    <div class="modern-caption">
+                                        <span class="badge bg-primary mb-2">New Arrival</span>
+                                        <h2>{{ banner.description }}</h2>
+                                        <p>{{ banner.small_description }}</p>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button id="heroPrev" class="modern-control prev" aria-label="Previous slide">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button id="heroNext" class="modern-control next" aria-label="Next slide">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+
+                    <div id="heroIndicators" class="modern-indicators"></div>
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Discounted Products -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="section-title mb-1">Crazy Discounts</h3>
+                    <p class="text-muted">Limited time offers</p>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'product_app:product_list' pk=1 %}"
+                       class="view-all-link">View All <i class="bi bi-arrow-right"></i></a>
+
+                    <div class="scroll-controls">
+                        <button type="button"
+                                class="btn btn-light btn-scroll-modern"
+                                onclick="scrollRow('discountProducts', -1)"
+                                aria-label="Scroll left">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-light btn-scroll-modern"
+                                onclick="scrollRow('discountProducts', 1)"
+                                aria-label="Scroll right">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="discountProducts"
+                 class="products-row"
+                 aria-label="discount products">
+                {% if discounted_products %}
+                    {% for product in products %}
+                        {% if product.final_price != product.price %}
+                            <div class="card product-card modern-card">
+                                <span class="badge discount-badge-modern">Discounted</span>
+                                <a class="card-link text-decoration-none"
+                                   href="{% url 'product_app:product_details' pk=product.id %}">
+                                    <img class="card-img-top modern-img"
+                                         src="{{ product.image.url }}"
+                                         alt="{{ product.name }}"
+                                         loading="lazy">
+                                    <div class="card-body">
+                                        <h6 class="product-title">{{ product.name }}</h6>
+                                        <p class="product-desc">{{ product.description|truncatechars:40 }}</p>
+                                        <div class="card-price-row">
+                                            <div>
+                                                <small class="old-price me-2">KSh {{ product.price }}</small>
+                                                <span class="final-price">KSh {{ product.final_price }}</span>
+                                            </div>
+                                            <button class="btn btn-primary btn-sm modern-btn"
+                                                    type="button"
+                                                    onclick="location.href='{% url 'product_app:product_details' pk=product.id %}'">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted w-100 text-center py-5">No discounted products available</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- New Arrivals -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="section-title mb-1">New Arrivals</h3>
+                    <p class="text-muted">Latest products just for you</p>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'product_app:product_list' pk=0 %}"
+                       class="view-all-link">View All <i class="bi bi-arrow-right"></i></a>
+
+                    <div class="scroll-controls">
+                        <button type="button"
+                                class="btn btn-light btn-scroll-modern"
+                                onclick="scrollRow('newProducts', -1)"
+                                aria-label="Scroll left">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-light btn-scroll-modern"
+                                onclick="scrollRow('newProducts', 1)"
+                                aria-label="Scroll right">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="newProducts"
+                 class="products-row"
+                 aria-label="new products">
+                {% for product in new_products %}
+                    <div class="card product-card modern-card">
+                        {% if product.final_price != product.price %}
+                            <span class="badge discount-badge-modern">-{{ product.discount_percent }}%</span>
+                        {% endif %}
+                        <a class="card-link text-decoration-none"
+                           href="{% url 'product_app:product_details' pk=product.id %}">
+                            <img class="card-img-top modern-img"
+                                 src="{{ product.image.url }}"
+                                 alt="{{ product.name }}"
+                                 loading="lazy">
+                            <div class="card-body">
+                                <h6 class="product-title">{{ product.name }}</h6>
+                                <p class="product-desc">{{ product.description|truncatechars:40 }}</p>
+                                <div class="card-price-row">
+                                    {% if product.final_price != product.price %}
+                                        <div>
+                                            <small class="old-price me-2">KSh{{ product.price }}</small>
+                                            <span class="final-price">KSh{{ product.final_price }}</span>
+                                        </div>
+                                    {% else %}
+                                        <div>
+                                            <span class="final-price">KSh{{ product.price }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <button class="btn btn-primary btn-sm modern-btn"
+                                            type="button"
+                                            onclick="location.href='{% url 'product_app:product_details' pk=product.id %}'">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% empty %}
+                    <p class="text-muted w-100 text-center py-5">No new products available</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <div class="container">
+              <div class="row">
+                <div>
+                    <h3 class="section-title mb-1">What People Say About Shee Gift Shop</h3>
+                </div>
+              </div>
+              <br>
+              <div class="row">
+                <div class="testimonials-content">
+                  <div class="testimonials-box">
+                    <div class="testimonials-img">
+                      <div class="test-img">
+                        <img src="{% static 'img/rev-1.jpg' %}" />
+                      </div>
+                      <div class="testimonials-text">
+                        <p>I recently had the pleasure of shopping at Shee Gifts & Flowers, and I couldn't be more impressed! The customization process was incredibly easy... 
+                            my gift turned out exactly as I envisioned, and the quality was exceptional.</p>
+                        <h6>George</h6>
+                        <p></p>
+                      </div>
+                    </div>
+                    <div class="testimonials-img">
+                      <div class="test-img">
+                        <img src="{% static 'img/rev-1.jpg' %}" />
+                      </div>
+                      <div class="testimonials-text">
+                        <p>Lovely and unique items. The ladies who work there were very helpful and pleasant!</p>
+                        <h6>Peter M</h6>
+                        <p></p>
+                      </div>
+                    </div>
+                    <div class="testimonials-img">
+                      <div class="test-img">
+                        <img src="{% static 'img/rev-1.jpg' %}" />
+                      </div>
+                      <div class="testimonials-text">
+                        <p>Easy order and efficient. Absolutely thrilled with my items. Good quality glass at an excellent price with stunning personalized engraving. Packed to perfection ❤️</p>
+                        <h6>Eshther K</h6>
+                        <p></p>
+                      </div>
+                    </div>
+                    <div class="testimonials-img">
+                      <div class="test-img">
+                        <img src="{% static 'img/rev-1.jpg' %}" />
+                      </div>
+                      <div class="testimonials-text">
+                        <p>I ordered a gift hamper from Shee Gift last week, and I was amazed at how quickly it arrived</p>
+                        <h6>K Njoroge</h6>
+                        <p></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slider"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        <!-- Features Section -->
+        <section class="features-section py-5">
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <div class="feature-card">
+                        <i class="bi bi-truck"></i>
+                        <h6>Same-Day Delivery</h6>
+                        <p>Enjoy same-day Gifts & Flowers delivery in Thika & Nairobi.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="feature-card">
+                        <i class="bi bi-shield-check"></i>
+                        <h6>Secure Payment</h6>
+                        <p>We accept lipa na Mpesa & all major trusted payment gateways. </p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="feature-card">
+                        <i class="bi bi-emoji-smile"></i>
+                        <h6>100% Satisfaction Guarantee</h6>
+                        <p>We promise to make sending and receiving our gifts a joy.</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="feature-card">
+                        <i class="bi bi-headset"></i>
+                        <h6>24/7 Support</h6>
+                        <p>0788 460 056 / 0788 345 905</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="{% static 'js/homepage.js' %}"></script>
+{% endblock contents %}

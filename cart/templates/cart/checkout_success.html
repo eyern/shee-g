@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Order Placed Successfully{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/checkout_success.css' %}">
+{% endblock head %}
+
+{% block contents %}
+    <div class="container checkout-success-page">
+        <div class="checkout-success-card">
+            <div class="checkout-success-icon">✓</div>
+            <h1 class="checkout-success-title">Order placed successfully!</h1>
+            <p class="checkout-success-text">Thank you for Shopping With Shee Gifts & Flowers. We'll process your order shortly.</p>
+            <a href="{% url 'product_app:product_list' pk=0 %}" class="checkout-success-btn">Back to Shopping</a>
+        </div>
+    </div>
+{% endblock contents %}

@@ -1,0 +1,67 @@
+/* ================================================= */
+/* CHECKOUT SUCCESS – MODERN UI */
+/* ================================================= */
+
+.checkout-success-page {
+    padding: 3rem 0 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.checkout-success-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.checkout-success-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.25rem;
+    background: #d1fae5;
+    color: #059669;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 64px;
+    border-radius: 50%;
+}
+
+.checkout-success-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem;
+}
+
+.checkout-success-text {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+}
+
+.checkout-success-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.checkout-success-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}

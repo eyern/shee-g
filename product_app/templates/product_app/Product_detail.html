@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} in Thika{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+{% endblock head %}
+
+{% block contents %}
+<div class="product-detail-page">
+    <div class="container">
+
+        <!-- Breadcrumb -->
+        <div class="product-breadcrumb">
+            <a href="{% url 'home_app:home' %}">Home</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="{% url 'product_app:category' %}">Categories</a>
+            <i class="bi bi-chevron-right"></i>
+            <a href="{% url 'product_app:product_list' pk=0 %}?category={{ product.category.id }}">{{ product.category }}</a>
+            <i class="bi bi-chevron-right"></i>
+            <span>{{ product.name }}</span>
+        </div>
+
+        <!-- Main Product Section -->
+        <div class="product-main">
+            <!-- Product Gallery (چپ) -->
+            <div class="product-gallery">
+                <div class="product-gallery-main">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-main-image" id="mainProductImage">
+
+                    <!-- Badges -->
+                    <div class="product-badges">
+                        {% if product.final_price != product.price %}
+                            <span class="badge badge-sale">Sale</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Wishlist Button -->
+                    <button class="product-wishlist-btn" id="wishlistToggle">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Info (وسط) -->
+            <div class="product-info">
+                <div class="product-header">
+                    <div class="product-brand">{{ product.brand|default:"Shee Gift" }}</div>
+                    <h1 class="product-title">{{ product.name }}</h1>
+
+                    <!-- Rating Summary -->
+                    <div class="product-rating-summary">
+                        <div class="product-rating-stars">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= product.rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="product-rating-value">{{ product.rating|floatformat:1 }}</span>
+                        <span class="product-rating-count">({{ comments|length }} reviews)</span>
+                    </div>
+                </div>
+
+                <!-- Price Section -->
+                <div class="product-pricing">
+                    {% if product.final_price != product.price %}
+                        <div class="product-price-wrapper">
+                            <span class="product-price-old">KSh{{ product.price }}</span>
+                            <span class="product-price-current">KSh{{ product.final_price }}</span>
+                        </div>
+                    {% else %}
+                        <div class="product-price-wrapper">
+                            <span class="product-price-current">KSh{{ product.price }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Stock Status -->
+                <div class="product-stock">
+                    {% if product.quantity >= 5 %}
+                        <div class="stock-status in-stock">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>In Stock</span>
+                        </div>
+                    {% elif 0 < product.quantity and product.quantity < 5 %}
+                        <div class="stock-status low-stock">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>Only {{ product.quantity }} left in stock</span>
+                        </div>
+                    {% else %}
+                        <div class="stock-status out-of-stock">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>Out of Stock</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Add to Cart Section (بدون اینپوت تعداد) -->
+                <div class="product-cart-section">
+                    <div class="product-action-buttons">
+                        {% if product.quantity != 0 %}
+                            {% if user.is_authenticated %}
+                                {% if already_in_cart %}
+                                    <div class="cart-button-group">
+                                        <button class="btn-product btn-product-secondary" disabled>
+                                            <i class="bi bi-check-lg"></i>
+                                            <span>Already in Cart</span>
+                                        </button>
+                                        <a href="{% url 'cart:cart' %}" class="btn-product btn-product-outline">
+                                            <i class="bi bi-cart"></i>
+                                            <span>View Cart</span>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <form action="{% url 'cart:add_to_cart' pk=product.id %}" method="POST" class="product-cart-form" id="addToCartForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn-product btn-product-primary" id="addToCartBtn">
+                                            <i class="bi bi-cart-plus"></i>
+                                            <span>Add to Cart</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn-product btn-product-primary" id="addToCartGuest" type="button">
+                                    <i class="bi bi-cart-plus"></i>
+                                    <span>Add to Cart</span>
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <button class="btn-product btn-product-disabled" disabled>
+                                <i class="bi bi-cart-x"></i>
+                                <span>Out of Stock</span>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Login Message -->
+                    <div id="loginMessage" class="product-login-message" style="display: none;">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Please log in to add items to your cart. Redirecting...</span>
+                    </div>
+                </div>
+
+                <br>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </form>
+                
+                
+                
+                <a href="https://api.whatsapp.com/send?phone=254788460056&text=Hi. I'm from Shee Gift website.%0A I would like to order {{ product.name }} {{ product.image.url }}" target="_blank" 
+                style="display:inline-block; background-color:#25D366; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold; margin-top:10px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:15px; vertical-align:middle; margin-right:5px;">
+                Order on WhatsApp
+                </a>
+            </div>
+
+            <!-- Cart Sidebar (راست - بالا) -->
+            <aside class="product-cart-sidebar">
+                <div class="cart-card">
+                    <div class="cart-card-header">
+                        <i class="bi bi-bag"></i>
+                        <h3>Your Cart</h3>
+                        <span class="cart-badge-large">{{ cart_items_count|default:"0" }}</span>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        {% if cart_items %}
+                            <div class="cart-items-list">
+                                {% for item in cart_items %}
+                                    <div class="cart-item">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-item-img">
+                                        <div class="cart-item-details">
+                                            <h4>{{ item.product.name|truncatechars:20 }}</h4>
+                                            <div class="cart-item-meta">
+                                                <span class="cart-item-qty">Qty: {{ item.quantity }}</span>
+                                                <span class="cart-item-price">KSh{{ item.total_price }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="cart-total">
+                                <span>Subtotal</span>
+                                <strong>KSh {{ cart_total }}</strong>
+                            </div>
+
+                            <a href="{% url 'cart:cart' %}" class="cart-checkout-btn">
+                                <i class="bi bi-cart-check"></i> View Cart & Checkout
+                            </a>
+                        {% else %}
+                            <div class="cart-empty-state">
+                                <i class="bi bi-cart-x"></i>
+                                <p>Your cart is empty</p>
+                                <a href="{% url 'product_app:product_list' pk=0 %}" class="cart-browse-btn">
+                                    <i class="bi bi-shop"></i> Browse Products
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="cart-empty-state">
+                            <i class="bi bi-person"></i>
+                            <p>Log in to see your cart</p>
+                            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="cart-login-btn">
+                                <i class="bi bi-box-arrow-in-right"></i> Log In
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+
+        <!-- Product Details Tabs (دست نزن) -->
+        <div class="product-tabs">
+            <ul class="tab-nav">
+                <li class="tab-nav-item active" data-tab="description">Description</li>
+                <li class="tab-nav-item" data-tab="reviews">Reviews ({{ comments|length }})</li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Description Tab -->
+                <div class="tab-pane active" id="tab-description">
+                    <div class="description-content">
+                        {{ product.description|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div class="tab-pane" id="tab-reviews">
+                    <!-- Comments Section -->
+                    <div class="comments-section">
+                        <h3>Customer Reviews</h3>
+
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                                <div class="comment-item">
+                                    <div class="comment-header">
+                                        <div class="commenter-avatar">
+                                            <i class="bi bi-person-circle"></i>
+                                        </div>
+                                        <div class="commenter-info">
+                                            <h4>{{ comment.user.username }}</h4>
+                                            <div class="comment-stars">
+                                                {% for i in "12345"|make_list %}
+                                                    {% if forloop.counter <= comment.rating %}
+                                                        <i class="bi bi-star-fill"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <time class="comment-date">{{ comment.created_at|date:"M d, Y" }}</time>
+                                    </div>
+                                    <div class="comment-body">
+                                        <p>{{ comment.comment }}</p>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="no-comments">
+                                    <i class="bi bi-chat"></i>
+                                    <p>No reviews yet. Be the first to review this product!</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Add Review Form -->
+                        <div class="add-review">
+                            <h4>Write a Review</h4>
+
+                            {% if user.is_authenticated %}
+                                {% if not user_comment %}
+                                    <form method="POST" class="review-form" id="commentForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="comment">
+
+                                        <div class="form-group">
+                                            <label>Your Rating <span class="required">*</span></label>
+                                            <div class="star-rating-input">
+                                                <i class="bi bi-star" data-rating="1"></i>
+                                                <i class="bi bi-star" data-rating="2"></i>
+                                                <i class="bi bi-star" data-rating="3"></i>
+                                                <i class="bi bi-star" data-rating="4"></i>
+                                                <i class="bi bi-star" data-rating="5"></i>
+                                            </div>
+                                            <input type="hidden" name="rating" id="rating-value" required>
+                                            {% if form.rating.errors %}
+                                                <p class="error-message">{{ form.rating.errors.0 }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="comment">Your Review</label>
+                                            <textarea name="comment" id="comment" rows="4" placeholder="Share your thoughts about this product...">{{ form.comment.value|default:'' }}</textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn-product btn-product-primary">Submit Review</button>
+                                    </form>
+                                {% else %}
+                                    <div class="user-review">
+                                        <p><i class="bi bi-check-circle-fill text-success"></i> You have already reviewed this product.</p>
+                                        <div class="comment-item">
+                                            <div class="comment-header">
+                                                <div class="commenter-info">
+                                                    <h4>Your Review</h4>
+                                                    <div class="comment-stars">
+                                                        {% for i in "12345"|make_list %}
+                                                            {% if forloop.counter <= user_comment.rating %}
+                                                                <i class="bi bi-star-fill"></i>
+                                                            {% else %}
+                                                                <i class="bi bi-star"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <time class="comment-date">{{ user_comment.created_at|date:"M d, Y" }}</time>
+                                            </div>
+                                            <div class="comment-body">
+                                                <p>{{ user_comment.comment }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="guest-review">
+                                    <p>Please <a href="{% url 'accounts:login' %}?next={{ request.path }}">log in</a> to write a review.</p>
+                                    <button class="btn-product btn-product-outline" id="guestCommentBtn" type="button">Login to Review</button>
+                                    <div id="comment-login-warning" class="comment-login-warning" style="display: none;">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>Redirecting to login...</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Mobile Cart Toggle Button -->
+<button class="mobile-cart-toggle" id="mobileCartToggle">
+    <i class="bi bi-cart"></i>
+    <span class="mobile-cart-badge">{{ cart_items_count|default:"0" }}</span>
+</button>
+
+<!-- Mobile Cart Sidebar -->
+<div class="mobile-cart-sidebar" id="mobileCartSidebar">
+    <div class="mobile-cart-header">
+        <i class="bi bi-bag"></i>
+        <h3>Your Cart</h3>
+        <button class="mobile-cart-close" id="closeMobileCart">&times;</button>
+    </div>
+
+    <div class="mobile-cart-content">
+        {% if user.is_authenticated %}
+            {% if cart_items %}
+                <div class="mobile-cart-items">
+                    {% for item in cart_items %}
+                        <div class="mobile-cart-item">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="mobile-cart-item-img">
+                            <div class="mobile-cart-item-details">
+                                <h4>{{ item.product.name|truncatechars:20 }}</h4>
+                                <div class="mobile-cart-item-meta">
+                                    <span>Qty: {{ item.quantity }}</span>
+                                    <span class="mobile-cart-item-price">KSh {{ item.total_price }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mobile-cart-total">
+                    <span>Total</span>
+                    <strong>KSh {{ cart_total }}</strong>
+                </div>
+
+                <a href="{% url 'cart:cart' %}" class="mobile-cart-checkout">
+                    <i class="bi bi-cart-check"></i> View Cart & Checkout
+                </a>
+            {% else %}
+                <div class="mobile-cart-empty">
+                    <i class="bi bi-cart-x"></i>
+                    <p>Your cart is empty</p>
+                    <a href="{% url 'product_app:product_list' pk=0 %}" class="cart-browse-btn">
+                        Browse Products
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="mobile-cart-empty">
+                <i class="bi bi-person"></i>
+                <p>Log in to see your cart</p>
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="cart-login-btn">
+                    Log In
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/product_detail.js' %}"></script>
+{% endblock contents %}
