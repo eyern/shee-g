@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 def home_page(request):
     all_discounted_products = Discount.objects.all()
     products = Product.objects.all()
-    new_products = Product.objects.all().order_by('id')[10:20]
+    new_products = Product.objects.all()[10:20]
     all_banners = Banner.objects.all()
     for banner in all_banners:
         if banner.expire_at < timezone.now():
