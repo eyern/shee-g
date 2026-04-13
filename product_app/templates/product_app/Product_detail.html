@@ -6,6 +6,17 @@
 {% block head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+        <!-- Basic Open Graph Tags -->
+    <meta property="og:title" content="{{ product.name }}" />
+    <meta property="og:description" content="{{ product.description|truncatewords:20 }}" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+        
+        <!-- Use absolute URL for the image -->
+        {% if product.image %}
+            <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" />
+        {% endif %}
+    
+    
 {% endblock head %}
 
 {% block contents %}
