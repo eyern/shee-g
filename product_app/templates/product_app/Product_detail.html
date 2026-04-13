@@ -13,7 +13,7 @@
         
         <!-- Use absolute URL for the image -->
         {% if product.image %}
-            <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" />
+            <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }} {{ request.build_absolute_uri }}" />
         {% endif %}
     
     
@@ -167,10 +167,10 @@
                 
                 
                 
-                <a href="https://api.whatsapp.com/send?phone=254788460056&text=Hi. I'm from Shee Gift website.%0A I would like to order {{ product.name }} {{ product.price }} {{ product.image.url }}" target="_blank" 
+                <a href="https://api.whatsapp.com/send?phone=254788460056&text=Hi. I'm from Shee Gift website.%0A I would like to order {{ product.name }} Price: {{ product.price }} URL: {{ request.build_absolute_uri }}" target="_blank" 
                 style="display:inline-block; background-color:#25D366; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold; margin-top:10px;">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:15px; vertical-align:middle; margin-right:5px;">
-                Order on WhatsApp
+                WhatsApp to Order
                 </a>
             </div>
 
