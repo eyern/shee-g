@@ -167,7 +167,7 @@
                 
                 
                 
-                <a href="https://api.whatsapp.com/send?phone=254788460056&text=Hi. I'm from Shee Gift website.%0A I would like to order {{ product.name }} Price: {{ product.price }} URL: {{ request.build_absolute_uri }}" target="_blank" 
+                <a href="https://api.whatsapp.com/send?phone=254788460056&text=Hi. I'm from Shee Gift website.%0A I would like to order {{ product.name }} %0 Price: {{ product.price }} %0 URL: {{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}" target="_blank" 
                 style="display:inline-block; background-color:#25D366; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold; margin-top:10px;">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:15px; vertical-align:middle; margin-right:5px;">
                 WhatsApp to Order
