@@ -41,7 +41,6 @@ class Product(models.Model):
     rating = models.IntegerField(default=0,validators=[MaxValueValidator(5),MinValueValidator(0)])
     image = models.ImageField(upload_to='images/')
     description = models.TextField()
-    is_gift_wrap = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

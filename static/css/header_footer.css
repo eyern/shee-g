@@ -594,3 +594,11 @@ main {
     background-color: #fff;
   
   }
+
+    /* Additional custom styling to enhance the layout */
+.gift-option {
+    display: block;
+    font-size: 16px;
+    user-select: none;
+    font-weight: 300;
+  }

@@ -5,12 +5,6 @@ from cart.models import CartItem
 from product_app.models import Comments
 
 
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ['is_gift_wrap']
-        # The BooleanField automatically becomes a CheckboxInput widget
-
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comments

@@ -160,10 +160,23 @@
 
                 <br>
 
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                </form>
+                <div class="gift-options-container">
+                    <label class="gift-option">
+                      <input type="checkbox" name="gift-wrap" value="wrap">
+                      <span class="checkmark"></span>
+                      Gift Wrapping Required?
+                    </label>
+                    <label class="gift-option">
+                      <input type="checkbox" name="gift-card" value="card">
+                      <span class="checkmark"></span>
+                      Include Gift Card (Anniversary, Birthday, Love etc)
+                    </label>
+                    <label class="gift-option">
+                      <input type="checkbox" name="custom-message" value="message">
+                      <span class="checkmark"></span>
+                      Engraving / Branding Required?
+                    </label>
+                  </div>
                 
                 
                 

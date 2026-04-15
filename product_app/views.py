@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 
 from cart.models import Cart, CartItem
 from home_app.models import Discount
-from product_app.forms import CommentForm, ProductForm
+from product_app.forms import CommentForm
 from product_app.models import Product, Category, Comments
 from django.db.models import Q
 from .filters import ProductFilter
@@ -94,13 +94,6 @@ def product_details(request, pk):
 
     already_in_cart = False
     form = CommentForm()
-
-    if request.method == "POST":
-        form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
-            form.save() # Saves True/False based on checkbox
-    else:
-        form = ProductForm(instance=product)
 
     cart = None
     if user.is_authenticated:
